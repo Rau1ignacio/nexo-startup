@@ -1,50 +1,39 @@
-import { useMemo, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { publicRoutes } from "./public.routes.jsx";
+import { entrepreneurRoutes, providerRoutes } from "./app.routes.jsx";
+import { adminRoutes } from "./admin.routes.jsx";
 import PublicLayout from "../layouts/PublicLayout.jsx";
-import HomePage from "../../features/public/pages/HomePage.jsx";
-import RoadmapsPage from "../../features/public/pages/RoadmapsPage.jsx";
-import MarketplacePage from "../../features/public/pages/MarketplacePage.jsx";
-import LoginPage from "../../features/auth/pages/LoginPage.jsx";
-import RegisterPage from "../../features/auth/pages/RegisterPage.jsx";
+import AppLayout from "../layouts/AppLayout.jsx";
+import ProviderLayout from "../layouts/ProviderLayout.jsx";
+import AdminLayout from "../layouts/AdminLayout.jsx";
+import RoleGuard from "../providers/RoleGuard.jsx";
+
+function renderRoutes(routes) {
+  return routes.map(({ path, element, roles }) => (
+    <Route
+      key={path}
+      path={path}
+      element={roles ? <RoleGuard allow={roles}>{element}</RoleGuard> : element}
+    />
+  ));
+}
 
 export default function AppRouter() {
-  const [isRouterReady] = useState(true);
-
-  const routeConfig = useMemo(
-    () => [
-      { path: "/", element: <HomePage /> },
-      { path: "/roadmaps", element: <RoadmapsPage /> },
-      { path: "/marketplace", element: <MarketplacePage /> },
-      { path: "/auth/login", element: <LoginPage /> },
-      { path: "/auth/register", element: <RegisterPage /> },
-    ],
-    []
-  );
-
-  const notFoundMessage = useMemo(
-    () => "Pagina no encontrada. Vuelve al inicio para seguir explorando NEXO.",
-    []
-  );
-
-  if (!isRouterReady) {
-    return <div className="min-h-screen flex items-center justify-center">Preparando rutas...</div>;
-  }
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<PublicLayout />}>
-          {routeConfig.map(({ path, element }) => (
-            <Route key={path} path={path} element={element} />
-          ))}
-        </Route>
-
+        <Route element={<PublicLayout />}>{renderRoutes(publicRoutes)}</Route>
+        <Route element={<AppLayout />}>{renderRoutes(entrepreneurRoutes)}</Route>
+        <Route element={<ProviderLayout />}>{renderRoutes(providerRoutes)}</Route>
+        <Route element={<AdminLayout />}>{renderRoutes(adminRoutes)}</Route>
         <Route
           path="*"
           element={
             <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
               <h1 className="text-5xl font-bold">404</h1>
-              <p className="mt-4 text-gray-600 text-lg max-w-xl">{notFoundMessage}</p>
+              <p className="mt-4 text-gray-600 text-lg max-w-xl">
+                Pagina no encontrada. Vuelve al inicio para seguir explorando NEXO.
+              </p>
             </div>
           }
         />

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import RoadmapCard from "../components/RoadmapCard.jsx";
 
 export default function RoadmapsIndexPage() {
   const [query, setQuery] = useState("");
@@ -50,19 +51,12 @@ export default function RoadmapsIndexPage() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {filtered.map((roadmap) => (
-            <button
+            <RoadmapCard
               key={roadmap.id}
-              onClick={() => setHighlighted(roadmap.id)}
-              className={`rounded-3xl border px-6 py-6 text-left transition shadow-sm hover:-translate-y-1 ${
-                highlighted === roadmap.id
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-slate-800 border-slate-200"
-              }`}
-            >
-              <p className="text-sm uppercase tracking-widest">{roadmap.id}</p>
-              <h3 className="text-2xl font-semibold mt-2">{roadmap.title}</h3>
-              <p className="mt-3 text-base">{roadmap.desc}</p>
-            </button>
+              title={roadmap.title}
+              description={roadmap.desc}
+              onSelect={() => setHighlighted(roadmap.id)}
+            />
           ))}
         </div>
 
